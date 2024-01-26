@@ -18,7 +18,7 @@ export class AccountRepository{
     async getAccount(): Promise<Account[]> {
         return this.accountRepository.find();
     }
-    async getAccountByCpf(cpf: string): Promise<Account> {
+    async getAccountByCpf(cpf: string): Promise<Account | null> {
         return await this.accountRepository.findOne({ where: { cpf } });
     }
 }

@@ -1,10 +1,10 @@
-import { Account } from "src/shared/database/typeorm/Entities/account.entity";
+
 import { DataSource, DataSourceOptions } from "typeorm";
-import { Base } from "./typeorm/Entities/base.entity";
+import { Account } from "./typeorm/Entities/account.entity";
 console.log(`${__dirname}/migrations/*.ts`);
 export const dbDataSource: DataSourceOptions = {
     type: 'postgres',
-    host: 'localhost',
+    host: 'db',
     port: 5432,
     username: 'postgres',
     password: 'postgres',

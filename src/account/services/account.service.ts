@@ -1,18 +1,17 @@
 import { BadRequestException, Injectable, UnprocessableEntityException } from "@nestjs/common";
-import { CreateAccountDto } from "../dto/accountDto";
+import { CreateAccountDto, ResponseAccountDto } from "../dto/accountDto";
 import { CpfValidator } from "../services/validateCpf";
 import { Account } from "../../shared/database/typeorm/Entities/account.entity";
 import { AccountRepository } from "../Repositories/account.repository";
 import { LimparCpf } from "../services/limparCpf";
-import { IPaginationOptions, Pagination, paginate } from "nestjs-typeorm-paginate";
-import { Repository } from "typeorm";
+
 
 @Injectable()
-export class AccountService{
-    constructor (private accountRepository: AccountRepository, private repository: Repository<Account>) {}
+export class AccountService {
+    constructor (private accountRepository: AccountRepository) {}
 
 
-    async createAccount(createAccountDto: CreateAccountDto): Promise<Account> {
+    async createAccount(createAccountDto: CreateAccountDto): Promise<ResponseAccountDto> {
         const { name, cpf, dateOfBirth } = createAccountDto;
         const cpfValidator = new CpfValidator();
         const cpfIsValid = cpfValidator.validate(cpf);
@@ -20,15 +19,18 @@ export class AccountService{
             throw new UnprocessableEntityException('CPF is invalid');
         }
         if (await this.accountRepository.getAccountByCpf(LimparCpf.limpar(cpf))) {
-            throw new BadRequestException('CPF already exists');
+            throw new UnprocessableEntityException('CPF already exists');
         }
-        const account = await this.accountRepository.createAccount({ name, cpf: LimparCpf.limpar(cpf), dateOfBirth: new Date(dateOfBirth) }); // Remove the unnecessary comma
-        return account;
+        const account = await this.accountRepository.createAccount({ name, cpf: LimparCpf.limpar(cpf), dateOfBirth}); // Remove the unnecessary comma
+        return new ResponseAccountDto(account);
     }
-    // async paginateAccount(options: IPaginationOptions): Promise<Pagination<Account>> {
-    //     return paginate<Account>(this.repository, options);
-    // }
-    async getAccountByCpf(cpf: string): Promise<Account> {
-        return this.accountRepository.getAccountByCpf(cpf);
+  
+    async getAccountByCpf(cpf: string): Promise<ResponseAccountDto> {
+        const account = await this.accountRepository.getAccountByCpf(cpf);
+        if (account == null){
+            throw new BadRequestException('Account not found');
+        }
+        return new ResponseAccountDto(account);
     }
+    
 }
