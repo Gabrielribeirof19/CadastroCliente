@@ -1,24 +1,24 @@
 import { Injectable } from "@nestjs/common";
-import { Repository} from "typeorm"; // Import the missing package
-import { Account } from "../Entities/account.entity";
-import { InjectRepository } from "@nestjs/typeorm";
+
+import { Account } from "../../shared/database/typeorm/Entities/account.entity";
 import { CreateAccountDto } from "../dto/accountDto";
+import { Repository } from "typeorm";
+import { InjectRepository } from "@nestjs/typeorm";
 
 @Injectable()
 export class AccountRepository{
 
-    constructor (
+    constructor(
         @InjectRepository(Account)
-        private readonly typeOrmRepository: Repository<Account>
-        ) {}
-
+        private readonly accountRepository: Repository<Account>,
+      ) {}
     async createAccount(createAccountDto: CreateAccountDto): Promise<Account> {
-        return this.typeOrmRepository.save(createAccountDto);
+        return this.accountRepository.save(createAccountDto);
     }
     async getAccount(): Promise<Account[]> {
-        return this.typeOrmRepository.find();
+        return this.accountRepository.find();
     }
     async getAccountByCpf(cpf: string): Promise<Account> {
-        return this.typeOrmRepository.findOne({ where: { cpf } });
+        return await this.accountRepository.findOne({ where: { cpf } });
     }
 }

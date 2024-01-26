@@ -1,12 +1,15 @@
-import { BadRequestException, Injectable } from "@nestjs/common";
+import { BadRequestException, Injectable, UnprocessableEntityException } from "@nestjs/common";
 import { CreateAccountDto } from "../dto/accountDto";
 import { CpfValidator } from "../services/validateCpf";
-import { Account } from "../Entities/account.entity";
+import { Account } from "../../shared/database/typeorm/Entities/account.entity";
 import { AccountRepository } from "../Repositories/account.repository";
+import { LimparCpf } from "../services/limparCpf";
+import { IPaginationOptions, Pagination, paginate } from "nestjs-typeorm-paginate";
+import { Repository } from "typeorm";
 
 @Injectable()
 export class AccountService{
-    constructor (private accountRepository: AccountRepository) {}
+    constructor (private accountRepository: AccountRepository, private repository: Repository<Account>) {}
 
 
     async createAccount(createAccountDto: CreateAccountDto): Promise<Account> {
@@ -14,20 +17,18 @@ export class AccountService{
         const cpfValidator = new CpfValidator();
         const cpfIsValid = cpfValidator.validate(cpf);
         if (!cpfIsValid) {
-            throw new BadRequestException('CPF is invalid');
+            throw new UnprocessableEntityException('CPF is invalid');
         }
-        if (await this.accountRepository.getAccountByCpf(cpf)) {
+        if (await this.accountRepository.getAccountByCpf(LimparCpf.limpar(cpf))) {
             throw new BadRequestException('CPF already exists');
         }
-        const account = await this.accountRepository.createAccount({ name, cpf, dateOfBirth });
-
-        return account;    
+        const account = await this.accountRepository.createAccount({ name, cpf: LimparCpf.limpar(cpf), dateOfBirth: new Date(dateOfBirth) }); // Remove the unnecessary comma
+        return account;
     }
-    async listAccount(): Promise<Account[]> {
-        const listAccount = await this.accountRepository.getAccount();
-        if (!listAccount) {
-            throw new BadRequestException('No accounts found');
-        }
-        return listAccount;
+    // async paginateAccount(options: IPaginationOptions): Promise<Pagination<Account>> {
+    //     return paginate<Account>(this.repository, options);
+    // }
+    async getAccountByCpf(cpf: string): Promise<Account> {
+        return this.accountRepository.getAccountByCpf(cpf);
     }
 }
