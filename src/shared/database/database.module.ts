@@ -1,8 +1,8 @@
 import { Module } from "@nestjs/common";
 import { TypeOrmModule } from "@nestjs/typeorm";
-import { resolve } from "path";
-import { Account } from "src/shared/database/typeorm/Entities/account.entity";
-import { Base } from "./typeorm/Entities/base.entity";
+
+import { Account } from "../database/typeorm/Entities/account.entity";
+
 
 @Module({
     imports: [

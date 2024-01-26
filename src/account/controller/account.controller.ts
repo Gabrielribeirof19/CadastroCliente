@@ -18,9 +18,14 @@ export class AccountController {
         return this.accountService.createAccount(createAccountDto);
     }
     
-    @Get()
+    @Get("list")
     async getAccounts(@Query() paginationDto: PaginationDto) {
         return this.paginateService.getAccounts(paginationDto);
+    }
+
+    @Get()
+    async hello(): Promise<string> {
+        return "Hello World!";
     }
 
     @Get("listAccountByCpf")
