@@ -1,7 +1,7 @@
 
 import { DataSource, DataSourceOptions } from "typeorm";
 import { Account } from "./typeorm/Entities/account.entity";
-console.log(`${__dirname}/migrations/*.ts`);
+
 export const dbDataSource: DataSourceOptions = {
     type: 'postgres',
     host: 'db',

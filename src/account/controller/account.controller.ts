@@ -25,7 +25,6 @@ export class AccountController {
 
     @Get("listAccountByCpf")
     async listAccountByCpf(@Query('cpf') cpf: string): Promise<ResponseAccountDto>{
-        console.log(cpf);
         return this.accountService.getAccountByCpf(cpf);
     }
 }
