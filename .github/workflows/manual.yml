@@ -1,0 +1,21 @@
+name: github_Actions
+on:
+  pull_request:
+  
+    branches:
+      - master
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Use Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18.x'
+      - run: npm --prefix npm run install
+      - run: npm --prefix npm run build
+      - run: npm --prefix npm run test:cov
+      
